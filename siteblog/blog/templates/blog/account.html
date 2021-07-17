@@ -1,0 +1,288 @@
+{% load static %}
+{% load social_share %}
+{% load sidebar %}
+{% load menu %}
+{% load comment_tags %}
+{% load custom_timesince %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="TemplateMo">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i&display=swap"
+          rel="stylesheet">
+    <script src="https://kit.fontawesome.com/2d8e84536b.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <title>{% block title %} Редактирование аккаунта :: Ilya's Blog {% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{% static 'assets/images/favicon.png' %}"/>
+
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/register.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
+
+    {% include 'inc/_header.html' %}
+
+</head>
+
+<body>
+
+<!-- ***** Preloader Start ***** -->
+<div class="preloader">
+    <div class="jumper">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+<!-- ***** Preloader End ***** -->
+
+<!-- Header -->
+
+{% block content %}
+
+<div class="center-tabs">
+    <div class="tabs-wrapper">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Изменить данные</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Публикации</a>
+            </li>
+        </ul><!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                <div class="form_wrapper">
+                    <div class="form_container">
+                        <div class="title_container">
+                            <h2>Редактирование данных</h2>
+                            <hr>
+                        </div>
+                        <div class="row-form clearfix">
+                            <div class="">
+                                <form method="POST">
+                                    {% csrf_token %}
+
+                                    <div class="input_field" aria-placeholder="Email"><span><i aria-hidden="true"
+                                                                                               class="fa fa-envelope"></i></span>
+                                        {{ account_form.email }}
+                                        {% if account_form.email.errors %}
+                                        {% for error in account_form.email.errors %}
+                                        <div class="tool_tip">
+                                            {{ error }}
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
+
+                                    </div>
+                                    <div class="input_field"><span><i aria-hidden="true" class="fa fa-user"></i></span>
+                                        {{ account_form.username }}
+                                        {% if account_form.username.errors %}
+                                        {% for error in account_form.username.errors %}
+                                        <div class="tool_tip">
+                                            {{ error }}<br>
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
+
+                                        {% if account_form.non_field_errors %}
+                                        {% for error in account_form.non_field_errors %}
+                                        <div class="tool_tip" id="non_field">
+                                            {{ error }}<br>
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <input class="button" type="submit" value="Сохранить изменения"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="text" class="d-grid w-100">
+                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg" type="button">Вернуться на главную</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="tabs-2" role="tabpanel">
+                <section class="blog-posts grid-system">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                {% if blog_posts %}
+                                <div class="all-blog-posts">
+                                    <div class="row">
+                                        {% for post in blog_posts %}
+                                        <div class="col-lg-12">
+                            <div class="blog-post">
+                                <div class="blog-thumb">
+                                    {% if post.photo %}
+                                    <img src="{{ post.photo.url }}" alt="{{ post.title }}">
+                                    {% else %}
+                                    <img src="https://picsum.photos/id/1005/730/322?blur=1" alt="{{ post.title }}">
+                                    {% endif %}
+                                </div>
+                                <div class="down-content">
+                                    <span><a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a></span>
+                                    <a href="{{ post.get_absolute_url }}"><h4>{{ post.title }}</h4></a>
+                                    <ul class="post-info">
+                                        <li><a>{{ post.author }}</a></li>
+                                        <li><a>{% custom_timesince value=post.created_at %} назад </a></li>
+                                        <li><a href="{{ post.get_absolute_url }}{{ comments }}"><i class="far fa-comment"></i> {% get_comments_count post user %} </a></li>
+                                        <li><a><i class="far fa-eye"></i> {{ post.views }} </a></li>
+                                        {% if post.author == request.user %}
+                                           <li><a href="{% url 'edit' post.slug %}"><i class="fas fa-pencil-alt"></i></a></li>
+                                        {% endif %}
+                                    </ul>
+                                    {{ post.content|safe|truncatewords_html:50 }}
+                                    <div class="d-grid w-100">
+                                        <a href="{{ post.get_absolute_url }}{{ start }}" id="rd-more " class="btn btn-primary" type="button">Читать далее</a>
+                                    </div>
+                                    <hr>
+                                    <div class="post-options">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="post-tags">
+                                                    <li><i class="fa fa-tags"></i></li>
+                                                    {% if post.tags.exists %}
+                                                    {% for tag in post.tags.all %}
+                                                    <li><a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
+                                                    </li>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="post-share">
+                                                    <li><i class="fa fa-share-alt"></i></li>
+                                                    <li>{% post_to_facebook post.get_absolute_url " "%}</li>
+                                                    <li>{% post_to_twitter post.title post.get_absolute_url " " %}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                        {% endfor %}
+
+                                        {% include 'inc/_pagination.html' %}
+
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="no-posts">
+                                    <span>Данный пользователь пока не опубликовал ни одного поста</span>
+                                </div>
+                            {% endif %}
+                            </div>
+
+                            <div class="col-lg-4">
+                <div class="sidebar">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="account-info">
+                                <div class="account-info-header">
+                                    <span>Информация</span>
+                                </div>
+                                <div class="flex-wrapper">
+                                    <div class="left-side-wrapper">
+                                    <div class="left-side">
+                                        <div class="account-info-body">
+                                            <span>Пользователь</span>
+                                        </div>
+                                        <div class="account-info-body">
+                                            <span>Зарегистрирован</span>
+                                        </div>
+                                        <div class="account-info-body">
+                                            <span>Активность</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="right-side-wrapper">
+                                    <div class="right-side">
+                                        <div class="account-info-text">
+                                            <span>{{ request.user.username }}</span>
+                                        </div>
+                                        <div class="account-info-text">
+                                            <span>{{ request.user.date_joined|date:"d.m.Y, H:i" }}</span>
+                                        </div>
+                                        <div class="account-info-text">
+                                            <span>{{ request.user.last_login|date:"d.m.Y, H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+
+
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+<script src="https://kit.fontawesome.com/2d8e84536b.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+<!-- Additional Scripts -->
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<script src="{% static 'assets/js/owl.js' %}"></script>
+<script src="{% static 'assets/js/slick.js' %}"></script>
+<script src="{% static 'assets/js/isotope.js' %}"></script>
+<script src="{% static 'assets/js/accordions.js' %}"></script>
+
+<script language="text/Javascript">
+    cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+    function clearField(t) {                   //declaring the array outside of the
+        if (!cleared[t.id]) {                      // function makes it static and global
+            cleared[t.id] = 1;  // you could use true and false, but that's more typing
+            t.value = '';         // with more chance of typos
+            t.style.color = '#fff';
+        }
+    }
+</script>
+
+{% load sweetify %}
+{% sweetify %}
+
+{% include 'inc/_footer.html' %}
+
+</body>
+</html>

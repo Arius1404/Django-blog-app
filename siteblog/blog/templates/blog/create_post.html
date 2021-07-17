@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} {{ title }} :: {{ block.super }} {% endblock %}
+{% block content %}
+
+<style>
+    .error-message {
+        color: red;
+        margin-top: -30px;
+        margin-bottom: 20px;
+        font-size: 12px;
+    }
+
+    .tool_tip {
+        /* font */
+        display: inline-block;
+        font-family: 'Roboto', sans-serif;
+        font-size: 13px;
+        font-weight: bold;
+        color: #cc0033;
+        line-height: 20px;
+        /* background */
+        background-color: #fce4e4;
+        border: 1px solid #fcc2c3;
+        border-radius: 7px;
+        -moz-border-radius: 7px;
+        -webkit-border-radius: 7px;
+        /* positioning */
+        float: left;
+        position: relative;
+        padding: 7px 11px 4px;
+        margin-top: 10px;
+    }
+
+    .select2-container .select2-dropdown .select2-results ul .select2-results__option--highlighted[aria-selected] {
+        background-color: #fb9857;
+        transition: all 0.3s;
+    }
+
+    .select2-selection--single {
+        height: 32px;
+    !important;
+    }
+
+</style>
+
+<script src="https://kit.fontawesome.com/2d8e84536b.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+<div class="container">
+    <div class="row">
+        <div class="form-container col-lg-10 mx-auto">
+            <form class="create-form" method="post" enctype="multipart/form-data" onclick="">{% csrf_token %}
+
+
+                <div class="form-create-title">
+                    <span class="form-create-title-text">Создайте пост! Расскажите нам свою увлекательную историю</span>
+                </div>
+                <hr>
+                {{ create_form.media }}
+                <div class="form-group">
+                    {{ create_form.title }}
+                    {% if create_form.title.errors %}
+                    {% for error in create_form.title.errors %}
+                    <div class="tool_tip col-lg-2" id="pr_tool">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {{ create_form.content }}
+                <hr>
+                <div class="field__wrapper">
+                    {{ create_form.photo }}
+                    <label class="field__file-wrapper" for="field__file-2">
+                        <div class="field__file-fake"><i class="fas fa-image fa-lg"></i></div>
+                        <div class="field__file-button">Выбрать</div>
+                    </label>
+                    <div class="preview">
+                        <img id="file-ip-1-preview">
+                    </div>
+                </div>
+                <hr>
+                <div class="main-wrapper">
+                    <div class="cat-wrapper">
+                        {{ create_form.category }}
+                        <div class="help-text">
+                            <i class="fa fa-warning"></i>
+                            <span>Пользовательские категории недоступны для выбора.</span>
+                        </div>
+                    </div>
+                    {% if create_form.category.errors %}
+                    {% for error in create_form.category.errors %}
+                    <div class="tool_tip_create col-lg-2">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                <hr>
+                <div class="tags-wrapper">
+                    {{ create_form.tags }}
+                    {% if create_form.tags.errors %}
+                    {% for error in create_form.tags.errors %}
+                    <div class="tool_tip_create">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    <div class="help-text">
+                        <i class="fa fa-warning"></i>
+                        <span>Пользовательские теги недоступны для выбора.</span>
+                    </div>
+                </div>
+                <hr>
+                <!-- Submit btn -->
+                <button id="submit_form_btn" class="submit-button btn btn-lg btn-primary btn-block" type="submit">
+                    Опубликовать пост
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let fields = document.querySelectorAll('.field__file');
+    Array.prototype.forEach.call(fields, function (input) {
+        let label = input.nextElementSibling,
+            labelVal = label.querySelector('.field__file-fake').innerText;
+
+        input.addEventListener('change', function (e) {
+            var file = $('#field__file-2')[0].files[0].name;
+            $(".field__file-fake").text(file);
+        });
+    });
+
+
+    function showPreview(event) {
+        if (event.target.files.length > 0) {
+            var src = URL.createObjectURL(event.target.files[0]);
+            var preview = document.getElementById("file-ip-1-preview");
+            preview.src = src;
+            preview.style.display = "block";
+        }
+    }
+
+
+</script>
+
+{% load sweetify %}
+{% sweetify %}
+
+{% endblock content %}

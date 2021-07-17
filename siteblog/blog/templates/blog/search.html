@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load sidebar %}
+{% load custom_timesince %}
+{% load social_share %}
+{% block title %} {{ title }} :: {{ block.super }} {% endblock %}
+{% load menu %}
+{% load comment_tags %}
+{% block content %}
+
+<section class="page-heading">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="text-content">
+                    {% if request.user.is_authenticated %}
+                    <h4>Привет, {{ request.user.username }} !</h4>
+                    <h2>Чувствуй себя как дома!</h2>
+                    {% else %}
+                    <h4>Привет, друг!</h4>
+                    <h2>Чувствуй себя как дома!</h2>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="blog-posts grid-system">
+    <div class="container">
+        {% if posts %}
+        <div class="search-result">
+            <span>
+                Результаты поиска по запросу: "{{ clear_req }}"
+            </span>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg-8">
+                {% if posts %}
+                <div class="all-blog-posts">
+                    <div class="row">
+                        {% for post in posts %}
+                        <div class="col-lg-12">
+                            <div class="blog-post">
+                                <div class="blog-thumb">
+                                    {% if post.photo %}
+                                    <img src="{{ post.photo.url }}" alt="{{ post.title }}">
+                                    {% else %}
+                                    <img src="https://picsum.photos/id/1005/730/322?blur=1" alt="{{ post.title }}">
+                                    {% endif %}
+                                </div>
+                                <div class="down-content">
+                                    <div class="category-wrapper">
+                                        <span><a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a></span>
+                                    </div>
+
+                                    <a href="{{ post.get_absolute_url }}"><h4>{{ post.title }}</h4></a>
+                                    <ul class="post-info">
+                                        <li><a>{{ post.author }}</a></li>
+                                        <li><a>{% custom_timesince value=post.created_at %} назад</a></li>
+                                        <li><a href="{{ post.get_absolute_url }}{{ comments }}"><i
+                                                class="far fa-comment"></i> {% get_comments_count post user %}</a></li>
+                                        <li><a><i class="far fa-eye"></i> {{ post.views }} </a></li>
+                                        {% if post.author == request.user %}
+                                           <li><a href="{% url 'edit' post.slug %}"><i class="fas fa-pencil-alt"></i></a></li>
+                                        {% endif %}
+                                    </ul>
+                                    {{ post.content|safe|truncatewords_html:50 }}
+                                    <div class="d-grid w-100">
+                                        <a href="{{ post.get_absolute_url }}{{ start }}" class="btn btn-primary"
+                                           type="button">Читать далее</a>
+                                    </div>
+                                    <hr>
+                                    <div class="post-options">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="post-tags">
+                                                    <li><i class="fa fa-tags"></i></li>
+                                                    {% if post.tags.exists %}
+                                                    {% for tag in post.tags.all %}
+                                                    <li><a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
+                                                    </li>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul class="post-share">
+                                                    <li><i class="fa fa-share-alt"></i></li>
+                                                    <li>{% post_to_facebook post.get_absolute_url " "%}</li>
+                                                    <li>{% post_to_twitter post.title post.get_absolute_url " " %}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% include 'inc/_pagination.html' %}
+
+                    </div>
+                </div>
+                {% else %}
+                    <div class="search-not-found">
+                        <span>К сожалению, по Вашему запросу ничего не найдено.</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="sidebar-item search">
+                                <form id="search_form" name="gs" method="GET" action="{% url 'search' %}">
+                                    <input type="text" name="s" class="searchText" placeholder="Search..."
+                                           autocomplete="on">
+                                </form>
+                            </div>
+                        </div>
+                        {% get_popular_posts %}
+                        <div class="col-lg-12">
+                            <div class="sidebar-item categories">
+                                <div class="sidebar-heading">
+                                    <h2>Categories</h2>
+                                </div>
+                                {% show_menu %}
+                            </div>
+                        </div>
+                        {% get_tag_cloud %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+

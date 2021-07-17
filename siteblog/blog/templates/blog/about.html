@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} {{ title }} :: {{ block.super }} {% endblock %}
+
+{% block content %}
+
+<!-- Page Content -->
+    <!-- Banner Starts Here -->
+    <section class="page-heading">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="text-content">
+                    {% if request.user.is_authenticated %}
+                    <h4>Привет, {{ request.user.username }} !</h4>
+                    <h2>Давай знакомиться!</h2>
+                    {% else %}
+                    <h4>Привет, друг!</h4>
+                    <h2>Давай знакомиться!</h2>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Banner Ends Here -->
+
+
+    <section class="about-us">
+      <div class="container">
+
+        <div class="row">
+          <div class="col-lg-12">
+            <img src="{% static 'assets/images/about_me.jpg' %}" alt="">
+            <p>Меня зовут Илья Тахтеев. <a href="{% url 'home' %}">Этот сайт</a> - мое детище и творение, которым я горжусь. Все мы тут - большая и дружная семья, и с радостью принимаем новичков в свой клуб. Любой может рассказать свою историю, поделиться проблемами, которые его гложут, ну или же, просто обсудить что-нибудь в приятной компании. Для этого всего лишь нужно собраться с силами и <a href="{% url 'create' %}">создать пост</a>. Также ты можешь <a href="{% url 'posts' %}">читать посты</a> других участников, а также оставлять комментарии.</p>
+            <p>Ты всегда можешь связаться со мной через социальные сети (ссылки находятся ниже)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}
